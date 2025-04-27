@@ -1,0 +1,4 @@
+from imports.MCmain import *
+
+Qobject: QFrame
+

@@ -1,0 +1,73 @@
+from imports.MCmain import *
+
+
+Qobject:QFrame
+
+# 主布局
+Qobject.hBoxLayout = QHBoxLayout(Qobject)
+
+# 左侧导航栏
+Qobject.navigationInterface = NavigationInterface(Qobject, showReturnButton=False)
+
+# 工具按钮
+Qobject.functionButton = DropDownToolButton(parent = Qobject)
+Qobject.functionButton.setIcon(FluentIcon.MORE)
+
+# 右侧主内容区域
+Qobject.rightWidget = QWidget(Qobject)
+Qobject.rightLayout = QVBoxLayout(Qobject.rightWidget)
+Qobject.rightLayout.setSpacing(0)
+Qobject.rightLayout.setContentsMargins(0, 0, 0, 0)
+
+# 聊天窗口区域
+Qobject.chatWindow = SmoothScrollArea(Qobject)
+Qobject.chatWindow.setWidgetResizable(True)
+Qobject.chatWindow.setObjectName("chatWindow")
+
+# 聊天内容区域
+Qobject.chatContent = QWidget(Qobject)
+Qobject.chatContent.setObjectName("chatContent")
+
+# 聊天内容布局
+Qobject.chatLayout = QVBoxLayout(Qobject.chatContent)
+Qobject.chatLayout.setAlignment(Qt.AlignmentFlag.AlignRight)
+Qobject.chatLayout.setContentsMargins(20, 8, 20, 8)
+Qobject.chatLayout.setSpacing(8)
+Qobject.chatLayout.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize)
+
+# 添加一个占位控件，确保接收消息完全靠左
+Qobject.leftSpacer = QWidget()
+Qobject.leftSpacer.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+Qobject.chatLayout.addWidget(Qobject.leftSpacer)
+
+# 添加一个占位符控件，防止第一条消息占据整个空间
+Qobject.spacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+Qobject.chatLayout.addItem(Qobject.spacer)
+
+# 设置滚动区域内容
+Qobject.chatWindow.setWidget(Qobject.chatContent)
+Qobject.chatWindow.setStyleSheet("QScrollArea#chatWindow {background-color: transparent;border: none;margin: 0;padding: 0;} QWidget#chatContent {background-color: transparent;margin: 0;padding: 0;}")
+
+Qobject.chatWindow.setWidget(Qobject.chatContent)
+
+# 输入区域
+Qobject.inputWidget = QWidget(Qobject)
+Qobject.inputLayout = QHBoxLayout(Qobject.inputWidget)
+Qobject.inputLayout.insertWidget(0, Qobject.functionButton)
+# 输入框
+Qobject.inputEdit = SearchLineEdit(Qobject)
+Qobject.inputEdit.setPlaceholderText("输入消息...")  # 添加默认提示文本
+Qobject.inputEdit.returnPressed.connect(Qobject.sendMessage)  # 添加回车键事件处理
+Qobject.sendButton = PrimaryPushButton("发送")
+Qobject.inputLayout.addWidget(Qobject.inputEdit)
+Qobject.inputLayout.addWidget(Qobject.sendButton)
+
+# 添加到右侧布局
+Qobject.rightLayout.addWidget(Qobject.chatWindow)  # 使聊天窗口占据剩余空间
+Qobject.rightLayout.addWidget(Qobject.inputWidget)
+
+# 设置主布局
+Qobject.hBoxLayout.setSpacing(0)
+Qobject.hBoxLayout.setContentsMargins(0, 0, 0, 0)
+Qobject.hBoxLayout.addWidget(Qobject.navigationInterface)
+Qobject.hBoxLayout.addWidget(Qobject.rightWidget, stretch=1)  # 使右侧区域占据剩余空间

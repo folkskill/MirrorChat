@@ -1,0 +1,37 @@
+from imports.MCmain import *
+
+Qobject: object
+
+ADDON_NAME = "encoder"
+
+def createTriggedSlot(key_name: str, args: dict = {}):return lambda: args["self"].functions[args["addon_name"]](args)
+
+def encode_message_to_image(args:dict) -> str:
+    import os
+    from subprocess import run
+    from time import sleep
+    # 主要脚本内容。
+    msg = args["self"].chat_frame.inputEdit.text()
+    open(f"bin/addon/{args['addon_name']}/msg.txt", "w", encoding="utf-8").write(msg)
+    open(f"bin/addon/{args['addon_name']}/config.txt", "w", encoding="utf-8").write('encode')
+    current_path = os.getcwd()
+    
+    args["chat_frame"].showInfo(run([f"{current_path}\\bin\\addon\\{args['addon_name']}\\tools\\file.exe"], capture_output=True), args["addon_name"])
+    
+    run_args = {
+        "file_path": f"{current_path}\\bin\\addon\\{args['addon_name']}\\result.bmp",
+        "is_silence": True
+    }
+
+    while not os.path.exists(run_args["file_path"]):
+        print("等待中...")
+        sleep(1)
+
+    args["self"].send_file(run_args)
+    args["chat_frame"].inputEdit.clear()
+
+fileAction = Action(FluentIcon.SHARE, "加密并发送", Qobject.chat_frame)
+fileAction.triggered.connect(createTriggedSlot("send_file", args={"chat_frame": Qobject.chat_frame, "self": Qobject, "addon_name": ADDON_NAME}))
+Qobject.chat_frame.functionMenu.addAction(fileAction)
+
+Qobject.functions[ADDON_NAME] = encode_message_to_image

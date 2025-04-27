@@ -1,0 +1,38 @@
+
+Qobject:None
+
+Qobject.settingLabel.move(60, 40)
+
+Qobject.personalGroup.addSettingCard(Qobject.enableAcrylicCard)
+Qobject.personalGroup.addSettingCard(Qobject.themeCard)
+Qobject.personalGroup.addSettingCard(Qobject.themeColorCard)
+Qobject.personalGroup.addSettingCard(Qobject.zoomCard)
+Qobject.personalGroup.addSettingCard(Qobject.languageCard)
+
+Qobject.onlineMusicGroup.addSettingCard(Qobject.onlinePageSizeCard)
+Qobject.onlineMusicGroup.addSettingCard(Qobject.onlineMusicQualityCard)
+Qobject.onlineMusicGroup.addSettingCard(Qobject.onlineMvQualityCard)
+
+Qobject.deskLyricGroup.addSettingCard(Qobject.deskLyricFontCard)
+Qobject.deskLyricGroup.addSettingCard(Qobject.deskLyricHighlightColorCard)
+Qobject.deskLyricGroup.addSettingCard(Qobject.deskLyricStrokeColorCard)
+Qobject.deskLyricGroup.addSettingCard(Qobject.deskLyricStrokeSizeCard)
+Qobject.deskLyricGroup.addSettingCard(Qobject.deskLyricAlignmentCard)
+
+Qobject.updateSoftwareGroup.addSettingCard(Qobject.updateOnStartUpCard)
+
+Qobject.mainPanelGroup.addSettingCard(Qobject.minimizeToTrayCard)
+
+Qobject.aboutGroup.addSettingCard(Qobject.helpCard)
+Qobject.aboutGroup.addSettingCard(Qobject.feedbackCard)
+Qobject.aboutGroup.addSettingCard(Qobject.aboutCard)
+
+# add setting card group to layout
+Qobject.expandLayout.setSpacing(28)
+Qobject.expandLayout.setContentsMargins(60, 10, 60, 0)
+Qobject.expandLayout.addWidget(Qobject.personalGroup)
+Qobject.expandLayout.addWidget(Qobject.onlineMusicGroup)
+Qobject.expandLayout.addWidget(Qobject.deskLyricGroup)
+Qobject.expandLayout.addWidget(Qobject.mainPanelGroup)
+Qobject.expandLayout.addWidget(Qobject.updateSoftwareGroup)
+Qobject.expandLayout.addWidget(Qobject.aboutGroup)

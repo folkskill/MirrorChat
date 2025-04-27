@@ -1,0 +1,6 @@
+{
+    "name": "example",
+    "version": "1.0",
+    "author": "MrDat",
+    "description": "This addon allows you to create a dat file from a folder."
+}

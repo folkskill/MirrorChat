@@ -1,0 +1,20 @@
+
+# Mirc 配置文件
+# 适用对象：
+#     标准子界面。(QFrame)
+
+from imports.MCmain import *
+
+args:tuple
+Qobject: QFrame
+text:str = args[0]
+
+Qobject.label = SubtitleLabel(text, Qobject)
+Qobject.hBoxLayout = QHBoxLayout(Qobject)
+
+setFont(Qobject.label, 24)
+Qobject.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+Qobject.hBoxLayout.addWidget(Qobject.label, 1, Qt.AlignmentFlag.AlignCenter)
+
+# 必须给子界面设置全局唯一的对象名
+Qobject.setObjectName(text.replace(' ', '-'))

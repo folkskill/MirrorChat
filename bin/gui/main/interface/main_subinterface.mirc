@@ -1,0 +1,7 @@
+from imports.MCmain import *
+
+Qobject: FluentWindow
+
+Qobject.addSubInterface(Qobject.homeInterface, FluentIcon.HOME, '主页')
+
+Qobject.addSubInterface(Qobject.settingsInterface, FluentIcon.SETTING, '设置')

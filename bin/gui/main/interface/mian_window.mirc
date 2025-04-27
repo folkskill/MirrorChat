@@ -1,0 +1,15 @@
+from imports.MCmain import *
+
+Qobject: FluentWindow
+args:tuple
+
+window_size = args[0]
+
+# 设置窗口图标
+Qobject.setWindowIcon(QIcon(':/qfluentwidgets/images/logo.png'))
+# 设置窗口标题
+Qobject.setWindowTitle('MirrorChat')
+# 设置窗口大小
+Qobject.resize(window_size[0], window_size[1])
+# 设置窗口是否可以缩放
+Qobject.setWindowFlag(Qt.WindowType.WindowMaximizeButtonHint, True)
