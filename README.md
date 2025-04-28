@@ -42,10 +42,11 @@ pip install colorama
 在 GitHub 中点击下载 ZIP。
 将项目解压并开始您的拓展使用！
 
-## 关于 Wcferry🚀️ 
+## 关于 Wcferry🚀️
 
-wcferry 是一个优秀的微信集成开发工具。
-可以前往这个链接访问其 Github 仓库。[lich0821/WeChatFerry： 微信机器人，可接入DeepSeek、Gemini、ChatGPT、ChatGLM、讯飞星火、Tigerbot等大模型。微信 hook WeChat Robot Hook. (github.com)](https://github.com/lich0821/WeChatFerry)
+[wcferry]([wcferry](https://github.com/lich0821/WeChatFerry)) 是一个优秀的微信集成开发工具。
+其提供了很多与微信交互的方法和功能。
+没有这个模块，本项目绝对无法持续的开发！
 
 ## 运行示例▶️
 
