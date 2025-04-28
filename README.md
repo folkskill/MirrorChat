@@ -42,11 +42,6 @@ pip install colorama
 在 GitHub 中点击下载 ZIP。
 将项目解压并开始您的拓展使用！
 
-## 关于 Wcferry🚀️
-
-[wcferry]([wcferry](https://github.com/lich0821/WeChatFerry)) 是一个优秀的微信集成开发工具。
-其提供了很多与微信交互的方法和功能。
-没有这个模块，本项目绝对无法持续的开发！
 
 ## 运行示例▶️
 
@@ -69,6 +64,12 @@ python MirrorChatMain.py
 
 另外的，本人不允许他人在本项目的原版基础上进行源码修改并发布。
 （除非经过本人的允许）
+
+## 关于 Wcferry🚀️
+
+[wcferry]([wcferry](https://github.com/lich0821/WeChatFerry)) 是一个优秀的微信集成开发工具。
+其提供了很多与微信交互的方法和功能。
+没有这个模块，本项目绝对无法持续的开发！
 
 ## 关于作者
 
