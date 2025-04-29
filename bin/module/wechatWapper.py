@@ -1,9 +1,18 @@
+from logRecoder import MirrorChatLogger
 from queue import Empty
 from wcferry import *
 import threading
 
-wcf = Wcf()
+wcf: Wcf
 enableReceive = True
+wasInit = False
+
+@MirrorChatLogger.catch()
+def init_wcferry():
+    '''初始化wcferry，必须在使用其他函数之前调用'''
+    global wcf, wasInit
+    wcf = Wcf()
+    wasInit = True
 
 def getinfo(wxid: str):
     global wcf
@@ -28,6 +37,7 @@ def set_receving_msg(enable: bool):
 
     enableReceive = enable
 
+@MirrorChatLogger.catch()
 def enableReceivingMsg(handlerFunction):
     """
     开启监听消息线程，处理消息
@@ -46,14 +56,15 @@ def enableReceivingMsg(handlerFunction):
                 handlerFunction(getM)
             except Empty:
                 continue
-            except Exception as e:
-                print(f"ERROR: {e}")
-            
+
         print("监听消息线程已关闭...")
 
     set_receving_msg(True)
     threading.Thread(target=ProcessMsg, name="ListenMessageThread").start()
 
-if __name__ == '__main__':
-    enableReceivingMsg(lambda msg: print(f"收到消息：{msg.content}"))
-    while True: pass
+init_wcferry()
+
+if wasInit:
+    MirrorChatLogger.success("Wcferry was initialized successfully.")
+else:
+    MirrorChatLogger.critical("Wcferry was not initialized.")
