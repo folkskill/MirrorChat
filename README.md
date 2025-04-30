@@ -66,7 +66,7 @@ python MirrorChatMain.py
 
 ## 关于 Wcferry🚀️
 
-[wcferry]([wcferry](https://github.com/lich0821/WeChatFerry)) 是一个优秀的微信集成开发工具。
+[wcferry]([wcferry](https://github.com/lich0821/WeChatFerry) 是一个优秀的微信集成开发工具。
 其提供了很多与微信交互的方法和功能。
 没有这个模块，本项目绝对无法持续的开发！
 
