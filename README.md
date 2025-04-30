@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="18%" align="center" src="https://github.com/user-attachments/assets/70d86f36-b03a-45a2-9663-a481b5717abc" alt="logo">
+  <img width="18%" align="center" src="https://github.com/folkskill/MirrorChat/blob/main/icon.png" alt="logo">
 </p>
   <h1 align="center">
   MirrorChat
