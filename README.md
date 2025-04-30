@@ -72,7 +72,7 @@ python MirrorChatMain.py
 
 ## 关于作者 😄
 
-本项目由 [folkskill](https://github.com/folkskill)) 独立制作。
+本项目由 [folkskill](https://github.com/folkskill) 独立制作。
 
 # 版本更新 🎉️
 
