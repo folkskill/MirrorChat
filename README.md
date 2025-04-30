@@ -18,7 +18,7 @@
 
 <div align="center">
 
-![version](https://img.shields.io/badge/version-0.3.01-blue)
+![version](https://img.shields.io/badge/version-0.2.1.20250425_beta-blue)
 ![Interface](https://raw.githubusercontent.com/zhiyiYo/PyQt-Fluent-Widgets/master/docs/source/_static/Interface.jpg)
 
 </div>
