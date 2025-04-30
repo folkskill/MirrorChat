@@ -1,9 +1,10 @@
 <p align="center">
-  <img width="18%" align="center" src="https://github.com/folkskill/MirrorChat/blob/main/icon.png" alt="logo">
+  <img width="18%" align="center" src="https://github.com/user-attachments/assets/3b1f2665-5f26-4170-8563-9529df52c552" alt="logo">
 </p>
   <h1 align="center">
   MirrorChat
 </h1>
+
 <p align="center">
   基于 Wcferry 的微信拓展工具
 </p>
