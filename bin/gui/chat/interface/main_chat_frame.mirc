@@ -1,6 +1,5 @@
 from imports.MCmain import *
 
-
 Qobject:QFrame
 
 # 主布局
@@ -71,3 +70,22 @@ Qobject.hBoxLayout.setSpacing(0)
 Qobject.hBoxLayout.setContentsMargins(0, 0, 0, 0)
 Qobject.hBoxLayout.addWidget(Qobject.navigationInterface)
 Qobject.hBoxLayout.addWidget(Qobject.rightWidget, stretch=1)  # 使右侧区域占据剩余空间
+
+# 添加搜索框
+Qobject.searchEdit = LineEdit(Qobject)
+Qobject.searchEdit.setPlaceholderText("搜索联系人")
+Qobject.searchEdit.textChanged.connect(Qobject.filterContacts)
+Qobject.searchEdit.setMinimumWidth(200)
+Qobject.searchEdit.setClearButtonEnabled(True)
+# 重写 focusOutEvent 方法
+c = Qobject
+qle = QLineEdit
+def searchEditFocusOut(event):
+    global c, qle
+    c.searchEdit.hide()
+    qle.focusOutEvent(c.searchEdit, event)
+
+Qobject.searchEdit.focusOutEvent = searchEditFocusOut
+Qobject.searchEdit.hide()
+# 将搜索框添加到聊天内容区域顶部
+Qobject.navigationInterface.insertWidget(0, Qobject.searchEdit, Qobject.navigationInterface.childAt(0,0))

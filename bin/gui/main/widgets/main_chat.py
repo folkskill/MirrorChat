@@ -4,6 +4,25 @@ from module.wechatWapper import *
 from module.moduleLoader import load_module
 from gui.chat.widgets.message_widget import MessageWidget
 from gui.chat.widgets.file_message_widget import FileMessageWidget
+from module.logRecoder import MirrorChatLogger
+
+class DebugWXMsgContent:
+    def __init__(self, type = None,
+                  id = None,
+                    xml = None,
+                      sender = None,
+                        roomid = None,
+                          content = None,
+                            thumb = None,
+                              extra = None):
+        self.content = content
+        self.type = type
+        self.id = id
+        self.xml = xml
+        self.sender = sender
+        self.roomid = roomid
+        self.thumb = thumb
+        self.extra = extra
 
 class MainChatSingals(QObject):
     """主聊天界面信号类"""
@@ -13,10 +32,18 @@ class MainChatFrame(QFrame):
     """ 主聊天界面 """
 
     @staticmethod
+    @MirrorChatLogger.catch()
     def getwcf():
         return wcf
     
     def __init__(self, parent=None):
+        """
+        初始化主聊天界面
+            parent: 父窗口对象
+
+        :return: 无
+        """
+
         super().__init__(parent)
 
         self.setWindowTitle("聊天")
@@ -24,32 +51,40 @@ class MainChatFrame(QFrame):
 
         self.currentPath = os.getcwd()
         self.currentChat = None  # 当前聊天对象
-        self.contacts:list = get_contacts()
+        self.contacts:list = [
+            {
+                "wxid": "wxid_1234567890",
+                "name": "好友1",
+                "gender": "男",
+                "remark": "备注1",
+                "city": "北京",
+                "country": "中国"
+            }
+        ]
         self.chatObjectlist:list = []  # 用于存储聊天对象的列表
         self.chatMessageWidgetList:list = []  # 用于存储每个聊天的消息列表
-
-        self.navigationInterface:NavigationInterface
-        self.functionButton: DropDownToolButton
+        self.icons = {"wxid":FluentIcon.PEOPLE, "@chatroom":FluentIcon.CHAT}
         self.singals = MainChatSingals()
-        self.functionMenu: RoundMenu
-        self.rightWidget:QWidget
-        self.rightLayout:QVBoxLayout
-        self.chatWindow:SmoothScrollArea
-        self.chatContent:QWidget
-        self.chatLayout:QVBoxLayout
-        self.leftSpacer:QWidget
-        self.spacer:QSpacerItem
-        self.hBoxLayout:QHBoxLayout
-        self.inputEdit:QLineEdit
-        self.sendButton:ToolButton
+
+        self.navigationInterface: NavigationInterface
+        self.functionButton:      DropDownToolButton
+        self.functionMenu:        RoundMenu
+        self.rightWidget:         QWidget
+        self.rightLayout:         QVBoxLayout
+        self.chatWindow:          SmoothScrollArea
+        self.chatContent:         QWidget
+        self.chatLayout:          QVBoxLayout
+        self.leftSpacer:          QWidget
+        self.spacer:              QSpacerItem
+        self.hBoxLayout:          QHBoxLayout
+        self.inputEdit:           QTextBlock
+        self.sendButton:          ToolButton
+        self.searchEdit:          LineEdit
 
         # 加载窗口样式设置
         load_module(self, path = "bin\gui\chat\interface\main_chat_frame.mirc")
         
-        # 加载联系人侧边栏
         self.initNavigation()
-        # 初始化聊天ID列表
-        self.initChatList()
         # 初始化工具栏按钮
         self.initToolButton()
         # 聊天工具组
@@ -61,15 +96,13 @@ class MainChatFrame(QFrame):
         self.singals.singal_progess_message.connect(self.receiveMessage)
 
         # 初始化消息监听
-        # enableReceivingMsg(self.emitSignalMsg)
-
-        self.handleFileMessage(WxMsg(0,"NONE","XML","roomID","test.txt",'',''))
+        enableReceivingMsg(self.emitSignalMsg)
 
     def showInfo(self, content, title:str, duration:int = 3000, type:str = "info"):
         """显示侧边消息"""
         takes = {
             "info": InfoBar.info,
-            "warning": InfoBar.warning,
+            "warnning": InfoBar.warning,
             "error": InfoBar.error,
             "success": InfoBar.success
         }
@@ -86,13 +119,15 @@ class MainChatFrame(QFrame):
 
     def initToolButton(self):
         """初始化工具栏按钮"""
+
+        @MirrorChatLogger.catch()
         def createTriggedSlot(key_name: str, args: dict = {}):
             return lambda: self.chattools.functions[key_name](args)
         
         self.functionMenu = RoundMenu(parent=self)
 
         fileAction = Action(FluentIcon.FOLDER_ADD, "发送文件", self)
-        fileAction.triggered.connect(createTriggedSlot("send_file"))
+        fileAction.triggered.connect(createTriggedSlot("send_file",args={"is_silence":False}))
         self.functionMenu.addAction(fileAction)
 
     def initChatList(self, keywords:list = ["wxid", "@chatroom"]):
@@ -102,6 +137,7 @@ class MainChatFrame(QFrame):
 
         :return: 无
         """
+
         # 因为要重置，所以要先清空
         self.chatObjectlist.clear()
 
@@ -111,47 +147,88 @@ class MainChatFrame(QFrame):
                 if keyword in contact["wxid"] and contact["name"]:
                     # 写入聊天对象列表
                     self.chatObjectlist.append(contact)
+                    self.navigationInterface.addItem(
+                        icon = self.icons[keyword],
+                        routeKey = contact["wxid"],
+                        text = contact["name"],
+                        tooltip = contact["name"],
+                        position = NavigationItemPosition.SCROLL,
+                        onClick = lambda: self.setCurrentChat(self.chatObjectlist.index(contact))
+                    )
+
+    def filterContacts(self):
+        """根据搜索内容过滤联系人"""
+        search_text = self.searchEdit.text().strip().lower()
+
+        if not search_text:
+            self.initChatList()
+        
+        for contact in self.contacts:
+            self.navigationInterface.removeWidget(contact["wxid"])
+        
+        # 重新添加过滤后的联系人
+        index = 0
+        for contact in self.contacts:
+            # 如果搜索内容为空或匹配联系人名称
+            if not search_text or search_text in contact["name"].lower():
+                ok = False
+                icon = None
+                keywords = self.icons
+        
+                # 排除公众号
+                for keyword in keywords:
+                    if keyword in contact["wxid"] and contact["name"]:
+                        icon = keywords[keyword]
+                        ok = True
+                        break
+        
+                if not ok:
+                    continue
+
+        
+                # 使用闭包为每个导航项创建独立的点击事件处理函数
+                def create_click_handler(idx):
+                    return lambda: self.setCurrentChat(idx)
+        
+                self.navigationInterface.addItem(
+                    icon = icon,
+                    routeKey = contact["wxid"],
+                    text = contact["name"],
+                    tooltip = contact["name"],
+                    position = NavigationItemPosition.SCROLL,
+                    onClick = create_click_handler(index)
+                )
+                index += 1
 
     def initNavigation(self):
         """初始化导航栏"""
-        index = 0
 
-        for contact in self.contacts:
-            ok = False
-            icon = None
-            keywords = {
-                "wxid": FluentIcon.PEOPLE,
-                "@chatroom": FluentIcon.CHAT
-            }
+        # 添加搜索按钮到导航栏第一个位置
+        self.navigationInterface.addItem(
+            icon=FluentIcon.SEARCH,
+            routeKey="search_button",
+            text="搜索",
+            tooltip="搜索联系人",
+            position=NavigationItemPosition.TOP,
+            onClick=self.toggleSearchBox
+        )
+        
+        self.initChatList()
 
-            # 排除公众号
-            for keyword in keywords:
-                if keyword in contact["wxid"] and contact["name"]:
-                    icon = keywords[keyword]
-                    ok = True
-                    break
-
-            if not ok:
-                continue
-
-            # 使用闭包为每个导航项创建独立的点击事件处理函数
-            def create_click_handler(idx):
-                return lambda: self.setCurrentChat(idx)
-
-            self.navigationInterface.addItem(
-                icon = icon,
-                routeKey = contact["wxid"],
-                text = contact["name"],
-                tooltip = contact["name"],
-                position = NavigationItemPosition.SCROLL,
-                onClick = create_click_handler(index)
-            )
-
-            index += 1
-
+    def toggleSearchBox(self):
+        """切换搜索框的显示状态"""
+        if self.searchEdit.isVisible():
+            self.searchEdit.hide()
+        else:
+            self.searchEdit.show()
+            self.searchEdit.setFocus()
+            
     def setCurrentChat(self, index):
         # 设置当前聊天对象
         self.currentChat = self.chatObjectlist[index]
+        
+        # 隐藏搜索框
+        self.searchEdit.hide()
         
         # 清除所有消息控件
         while self.chatLayout.count() > 0:
@@ -159,16 +236,15 @@ class MainChatFrame(QFrame):
             item = self.chatLayout.takeAt(0)
             widget = item.widget()
 
-            # 只保留leftSpacer
-            if widget and widget not in [self.leftSpacer]:
+            # 只保留leftSpacer和搜索框
+            if widget and widget not in [self.leftSpacer, self.spacer, self.searchEdit]:
                 widget.deleteLater()
-                
+
         self.chatMessageWidgetList.clear()  # 清空消息控件列表
-
-        # 重新添加占位控件和spacer
-        self.chatLayout.addWidget(self.leftSpacer)
-        self.chatLayout.addItem(self.spacer)
-
+        
+        self.chatLayout.addWidget(self.leftSpacer)  # 添加占位控件
+        self.chatLayout.addSpacerItem(self.spacer)  # 添加占位控件
+        
     def emitSignalMsg(self, message:WxMsg):
         self.singals.singal_progess_message.emit(message)
 
@@ -193,7 +269,7 @@ class MainChatFrame(QFrame):
             self.inputEdit.clear()
 
             # 发送消息到微信
-            sendMsg(message, self.currentChat["wxid"])
+            # sendMsg(message, self.currentChat["wxid"])
             
             # 确保滚动条完全滚动到底部
             QTimer.singleShot(10, self.scrollToBottom)
@@ -214,7 +290,7 @@ class MainChatFrame(QFrame):
         if self.currentChat:
             if message.roomid != self.currentChat["wxid"]:
                 if message.id != self.currentChat["wxid"]:
-                    print("处理到非法消息。")
+                    MirrorChatLogger.error(f"Received message from {message.id}, but current chat is {self.currentChat['wxid']}")
                     return
 
         name = message.sender
@@ -230,16 +306,16 @@ class MainChatFrame(QFrame):
         # 确保滚动条完全滚动到底部
         QTimer.singleShot(10, self.scrollToBottom)
 
-    def handleFileMessage(self, message: WxMsg):
+    def handleFileMessage(self, message: WxMsg, is_me):
         """处理文件消息"""
-        if not self.currentChat:
+        if self.currentChat:
             return
 
         # 获取文件名和路径（需要根据实际消息结构调整）
         file_name = message.content
         
         # 判断是否是自己发送的消息
-        is_me = message.id == wcf.get_self_wxid()
+        # is_me = False
         
         timestamp = QDateTime.currentDateTime().toString("hh:mm:ss")
         

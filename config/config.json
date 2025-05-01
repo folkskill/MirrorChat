@@ -8,7 +8,7 @@
         "FontSize": 50,
         "HighlightColor": "#ff00fbff",
         "StrokeColor": "#ff9bf3ff",
-        "StrokeSize": 6
+        "StrokeSize": 0
     },
     "Folders": {
         "Download": "C:/Users/Folk.skill/Desktop/python/MirrorChat/download",
@@ -16,7 +16,7 @@
     },
     "MainWindow": {
         "DpiScale": "Auto",
-        "EnableAcrylicBackground": true,
+        "EnableAcrylicBackground": false,
         "Language": "zh_CN",
         "MinimizeToTray": false,
         "PlayBarColor": "#ff225c7f",
