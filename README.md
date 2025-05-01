@@ -77,6 +77,21 @@ python MirrorChatMain.py
 
 # 版本更新 🎉️
 
+## V0.3.0.20250501_beta 🚀️
+
+### 新增 🆕
+
+- 实现文件气泡控件,图片使用系统图标自动加载。(位于 `bin/gui/chat/widgets/file_message_widget.py`)
+- 使用 logrur 实现日志记录。(位于 `bin/module/logRecoder.py`)
+- 在主面板中加入了搜索联系人的功能。
+
+### 修复 ✅
+
+- 修复了文件发送时未选择文件时出现警告提示失效的问题。
+- 修复了消息气泡显示文本时，文本内容过多时，文本内容会被截断的问题，并优化显示区间。
+
+<details><summary>点击查看更多历史版本 👇</summary>
+
 ## V0.2.1.20250425_beta 🚀️
 
 ### 新增 🆕
@@ -84,8 +99,6 @@ python MirrorChatMain.py
 - 加入 `encoder` 插件，用于实现对消息的加密和解密。(用 C++ 实现，位于 `bin/addon/encoder/file.exe`, 主要贡献人是 `@blbl-SheepSoup`)
 - 在 `bin/module/chatTools.py` 中添加了对于插件的 `tool.mirc` 脚本的注入。
 - 在 `bin/module/chatTools.py` 中添加了发送文件的内置小工具。
-
-<details><summary>点击查看更多历史版本</summary>
 
 ## V0.2.0.20250410_beta 🚀️
 
