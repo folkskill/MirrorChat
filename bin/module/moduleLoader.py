@@ -10,7 +10,7 @@
     `path`: 模块的路径
 
 """
-from logRecoder import MirrorChatLogger
+from module.logRecoder import MirrorChatLogger
 from colorama import Fore
 
 @MirrorChatLogger.catch()
@@ -21,9 +21,8 @@ def load_module(Qobject, args = [], path = "",):
         `args`: 要传递给模块的参数
         `path`: 模块的路径
     """
-    MirrorChatLogger.info(f"Try loading module file at: {Fore.BLUE}{path}")
+    MirrorChatLogger.info(f"Loading module file at: {Fore.BLUE}{path}")
     # 读取文件内容并统一换行符
     content = open(path, "r", encoding = "utf-8").read().replace('\r\n', ';')
     # 执行整个文件内容
     exec(content)
-    MirrorChatLogger.info(f"Module file loaded successfully at: {Fore.BLUE}{path}")
