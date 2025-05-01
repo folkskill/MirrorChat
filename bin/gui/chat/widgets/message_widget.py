@@ -93,7 +93,7 @@ class MessageWidget(QWidget):
         # 绘制圆角矩形
         rect = self.rect()
         path = QPainterPath()
-        path.addRoundedRect(rect.x(), rect.y(), rect.width(), rect.height(), 10, 10)
+        path.addRoundedRect(rect.x(), rect.y(), rect.width(), rect.height(), 5, 5)
         
         # 设置透明背景
         painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Clear)
