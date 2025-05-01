@@ -10,7 +10,7 @@ MirrorChatLogger.add(
     diagnose=True
 )
 
-def processStop(type: function = MirrorChatLogger.info):
+def processStop(type = MirrorChatLogger.info):
     """
     处理程序停止时的操作，如关闭日志文件等。
     """
