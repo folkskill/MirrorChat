@@ -1,3 +1,4 @@
+from gui.addon.widgets.plugins_frame import PluginsFrame
 from gui.main.widgets.main_chat import MainChatFrame
 from gui.settings.settings import SettingsFrame
 from module.logRecoder import MirrorChatLogger
@@ -9,10 +10,11 @@ class MirrorChatMain(FluentWindow):
 
     def __init__(self, size:tuple = (900, 600)):
         super().__init__()
-
+        
         # 创建子界面
         self.homeInterface = MainChatFrame(self)
         self.settingsInterface = SettingsFrame(self)
+        self.pluginsInterface = PluginsFrame(self)
         
         # 加载窗口样式设置
         load_module(self, [size], "bin\gui\main\interface\mian_window.mirc")
@@ -24,8 +26,7 @@ class MirrorChatMain(FluentWindow):
         MirrorChatLogger.info("Closing MirrorChatMain...")
 
         return super().closeEvent(e)
-    
-@MirrorChatLogger.catch()
+
 def main():
     app = QApplication(sys.argv)
     w = MirrorChatMain()
@@ -38,14 +39,16 @@ def main():
     w.show()
 
     quitCode = app.exec()
+
+    MirrorChatLogger.info("MirrorChatMain is quiting...")
+    w.homeInterface.closeMsgListener()
+
     if quitCode != 0:
         # 退出失败，写入日志错误信息
         MirrorChatLogger.error(f"MirrorChatMain quitted with code {quitCode}.")
     else:
         # 退出成功
         MirrorChatLogger.success("MirrorChatMain quitted successfully.")
-
-    w.homeInterface.closeMsgListener()
 
     sys.exit(quitCode)
 

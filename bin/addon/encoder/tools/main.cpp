@@ -391,7 +391,6 @@ void FileTranslateToTwoDiemionCode(const char Line[], string OutPut_Line, int wi
 	if (!file.is_open())
 	{
 		std::cerr << "无法打开文件！" << std::endl;
-		system("pause");
 		return;
 	}
 	// 获取文件大小
@@ -407,17 +406,11 @@ void FileTranslateToTwoDiemionCode(const char Line[], string OutPut_Line, int wi
 	std::uintmax_t bytesRead = 0; // 已读取的字节数
 	// 循环读取文件，直到文件末尾
 	int Last = 0;
-	system("cls");
-	cout << "文件读取中zzz" << endl;
 	while (file.read(reinterpret_cast<char *>(buffer), bufferSize))
 	{
 		// 将读取的数据添加到向量中
 		data.insert(data.end(), buffer, buffer + file.gcount());
 		bytesRead += file.gcount();
-		// 计算并输出进度
-		// float progress = static_cast<double>(bytesRead) / fileSize * 100.0;
-		// cout << "bytesRead:" << bytesRead << "fileSize" << fileSize << endl;
-		// Last  = CreatProcess(30, bytesRead, fileSize, true, "▉", "▏", Last, "", "\n");
 	}
 	Last = 0;
 	// 检查文件末尾是否还有剩余数据（最后一次读取可能不足bufferSize）
@@ -491,7 +484,6 @@ void FileTranslateToTwoDiemionCode(const char Line[], string OutPut_Line, int wi
 
 		rgbInts.push_back(G);
 		rgbInts.push_back(R);
-		//	cout << "现在的RGB：" << R << " " << G << " " << B << " " << endl;
 	}
 
 	// 添加标识符:114514faceaa,16进制即为0B 2D 0E FA CE AA,RGB为11 45 14 250 206 170
@@ -538,12 +530,7 @@ void FileTranslateToTwoDiemionCode(const char Line[], string OutPut_Line, int wi
 		rgbInts.push_back(222);
 	}
 
-	//	writeBMP(OutPut_Line, rgbData, 21, 21);
-	// std::vector<int> rgbIntsw = {66,77,232,1,5,11};
-	// cout << "a";
 	saveBMP(OutPut_Line.c_str(), wight, hight, rgbInts);
-	// cout << "第一个RGB：" << "R:" << rgbInts[0] << "G:" << rgbInts[1] << "B:" << rgbInts[2] << endl;
-	// std::cout << "BMP文件已生成。" << std::endl;
 }
 
 void writeHexToFile(const std::vector<int> &data, const std::string &filename)
@@ -583,7 +570,6 @@ void TwoDiemionCodeTranslateToFile(const char Line[], string OutPut_Line)
 	if (!file.is_open())
 	{
 		std::cerr << "无法打开文件！" << std::endl;
-		system("pause");
 		return;
 	}
 	// 获取文件大小
@@ -778,30 +764,7 @@ jo:
 	//  打开输出文件
 	vector<int> kkk = {232, 164, 240};
 
-	// 接下来删去255的值
-	/*
-	int jj = VeRGB.size() - 1;
-	while (1) {
-		if (VeRGB[jj] == 255) {
-			//删去
-			cout << "kkk" << endl;
-			VeRGB.erase(VeRGB.end() - 1);
-			cout << "kkkw" << endl;
-		}
-		else
-		{
-			//cout << "kkk" << endl;
-			break;
-		}
-		jj--;
-	}
-	*/
 	writeHexToFile(VeRGB, OutPut_Line + "." + HouName);
-	// std::cout << "数据已写入文件 " << OutPut_Line <<  std::endl;
-
-	// cout << "R:" << nowRgb.R << endl;
-	// cout << "G:" << nowRgb.G << endl;
-	// cout << "B:" << nowRgb.B << endl;
 }
 
 // 要求选择路径函数
@@ -860,13 +823,11 @@ std::string WStringToUTF8(const std::wstring &wstr)
 
 int main(int argc, char const *argv[])
 {
-	freopen("../config.txt", "r", stdin);
 	string mode, target_path, output_path;
 
-	// 写入配置
-	cin >> mode;
-	target_path = "../msg.txt";
-	output_path = "../result.bmp";
+	mode = argv[1];
+	target_path = argv[2];
+	output_path = argv[3];
 
 	//  关闭输入输出缓存，使效率提升
 	ios::sync_with_stdio(false);
@@ -890,7 +851,7 @@ int main(int argc, char const *argv[])
 		file.close();
 
 		float jjj = sqrt(fileSize / 3);
-		int kk = jjj + 1;
+		int kk = jjj + 5;
 
 		FileTranslateToTwoDiemionCode(target_path.c_str(), output_path, kk, kk);
 	}

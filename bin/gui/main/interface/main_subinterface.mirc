@@ -2,6 +2,11 @@ from imports.MCmain import *
 
 Qobject: FluentWindow
 
+# 添加主页
 Qobject.addSubInterface(Qobject.homeInterface, FluentIcon.HOME, '主页')
 
+# 添加插件中心到导航栏
+Qobject.addSubInterface(Qobject.pluginsInterface, FluentIcon.APPLICATION, '插件中心')
+
+# 添加设置
 Qobject.addSubInterface(Qobject.settingsInterface, FluentIcon.SETTING, '设置')

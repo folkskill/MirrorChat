@@ -4,11 +4,14 @@ Qobject: object
 
 ADDON_NAME = "example"
 
-def createTriggedSlot(key_name: str, args: dict = {}):return lambda: args["self"].functions[args["addon_name"]](args)
-def show_debug_info(args:dict):args["chat_frame"].showInfo(title = args["addon_name"], content = "你好世界。", type = "success", duration = 3000)
+def createTriggedSlot(key_name: str, args: dict = {}):
+    return lambda: args["self"].functions[key_name](args)
+
+def show_debug_info(args:dict):
+    args["chat_frame"].showInfo(title = args["addon_name"], content = "你好世界。", type = "success", duration = 3000)
 
 fileAction = Action(FluentIcon.CODE, "测试插件", Qobject.chat_frame)
-fileAction.triggered.connect(createTriggedSlot("send_file", args={"chat_frame": Qobject.chat_frame, "self": Qobject, "addon_name": ADDON_NAME}))
+fileAction.triggered.connect(createTriggedSlot("example", args={"chat_frame": Qobject.chat_frame, "self": Qobject, "addon_name": ADDON_NAME}))
 Qobject.chat_frame.functionMenu.addAction(fileAction)
 
 Qobject.functions[ADDON_NAME] = show_debug_info

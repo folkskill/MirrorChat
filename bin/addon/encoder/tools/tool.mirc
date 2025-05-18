@@ -4,34 +4,52 @@ Qobject: object
 
 ADDON_NAME = "encoder"
 
-def createTriggedSlot(key_name: str, args: dict = {}):return lambda: args["self"].functions[args["addon_name"]](args)
+def createTriggedSlot(key_name: str, args: dict = {}):
+    """构建槽函数。"""
+    return lambda: args["self"].functions[key_name](args)
 
 def encode_message_to_image(args:dict) -> str:
+    """将消息加密并发送。"""
     import os
     from subprocess import run
-    from time import sleep
+    from time import sleep, time
     # 主要脚本内容。
     msg = args["self"].chat_frame.inputEdit.text()
-    open(f"bin/addon/{args['addon_name']}/msg.txt", "w", encoding="utf-8").write(msg)
-    open(f"bin/addon/{args['addon_name']}/config.txt", "w", encoding="utf-8").write('encode')
     current_path = os.getcwd()
-    
-    args["chat_frame"].showInfo(run([f"{current_path}\\bin\\addon\\{args['addon_name']}\\tools\\file.exe"], capture_output=True), args["addon_name"])
+    addon_path = f"{current_path}/bin/addon/{args['addon_name']}"
+    chat_frame = args["chat_frame"]
+
+    open(addon_path + "/msg.txt", "w", encoding="utf-8").write(msg)
     
     run_args = {
-        "file_path": f"{current_path}\\bin\\addon\\{args['addon_name']}\\result.bmp",
+        "file_path": addon_path + "/result.bmp",
         "is_silence": True
     }
 
-    while not os.path.exists(run_args["file_path"]):
-        print("等待中...")
-        sleep(1)
+    runs = [
+        f"{addon_path}/tools/main.exe",
+        "encode",
+        f"{addon_path}/msg.txt",
+        f"{addon_path}/result.bmp"
+    ]
+    # 执行脚本。
+    run(runs, shell=True)
 
+    # 等待文件生成。
+    old_time = time()
+    while not os.path.exists(run_args["file_path"]):
+        sleep(0.01)
+    new_time = time()
+    used_time = new_time - old_time
+    chat_frame.showInfo(title = args["addon_name"], content = f"用时{used_time}秒。", type = "success")
+
+    # 发送文件。
     args["self"].send_file(run_args)
-    args["chat_frame"].inputEdit.clear()
+    # 清空输入框。
+    chat_frame.inputEdit.clear()
 
 fileAction = Action(FluentIcon.SHARE, "加密并发送", Qobject.chat_frame)
-fileAction.triggered.connect(createTriggedSlot("send_file", args={"chat_frame": Qobject.chat_frame, "self": Qobject, "addon_name": ADDON_NAME}))
+fileAction.triggered.connect(createTriggedSlot("encoder", args={"chat_frame": Qobject.chat_frame, "self": Qobject, "addon_name": ADDON_NAME}))
 Qobject.chat_frame.functionMenu.addAction(fileAction)
 
 Qobject.functions[ADDON_NAME] = encode_message_to_image

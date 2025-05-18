@@ -6,24 +6,6 @@ from gui.chat.widgets.message_widget import MessageWidget
 from gui.chat.widgets.file_message_widget import FileMessageWidget
 from module.logRecoder import MirrorChatLogger
 
-class DebugWXMsgContent:
-    def __init__(self, type = None,
-                  id = None,
-                    xml = None,
-                      sender = None,
-                        roomid = None,
-                          content = None,
-                            thumb = None,
-                              extra = None):
-        self.content = content
-        self.type = type
-        self.id = id
-        self.xml = xml
-        self.sender = sender
-        self.roomid = roomid
-        self.thumb = thumb
-        self.extra = extra
-
 class MainChatSingals(QObject):
     """主聊天界面信号类"""
     singal_progess_message = pyqtSignal(WxMsg)
@@ -35,7 +17,8 @@ class MainChatFrame(QFrame):
     @MirrorChatLogger.catch()
     def getwcf():
         return wcf
-    
+
+    @MirrorChatLogger.catch()
     def __init__(self, parent=None):
         """
         初始化主聊天界面
@@ -51,17 +34,8 @@ class MainChatFrame(QFrame):
 
         self.currentPath = os.getcwd()
         self.currentChat = None  # 当前聊天对象
-        self.contacts:list = [
-            {
-                "wxid": "wxid_1234567890",
-                "name": "好友1",
-                "gender": "男",
-                "remark": "备注1",
-                "city": "北京",
-                "country": "中国"
-            }
-        ]
-        self.chatObjectlist:list = []  # 用于存储聊天对象的列表
+        self.contacts:list = get_contacts()
+        self.chatObjectlist:list[dict] = []  # 用于存储聊天对象的列表
         self.chatMessageWidgetList:list = []  # 用于存储每个聊天的消息列表
         self.icons = {"wxid":FluentIcon.PEOPLE, "@chatroom":FluentIcon.CHAT}
         self.singals = MainChatSingals()
@@ -83,8 +57,10 @@ class MainChatFrame(QFrame):
 
         # 加载窗口样式设置
         load_module(self, path = "bin\gui\chat\interface\main_chat_frame.mirc")
-        
+        # 初始化导航栏
         self.initNavigation()
+        # 初始化聊天列表
+        self.initChatList()
         # 初始化工具栏按钮
         self.initToolButton()
         # 聊天工具组
@@ -98,6 +74,7 @@ class MainChatFrame(QFrame):
         # 初始化消息监听
         enableReceivingMsg(self.emitSignalMsg)
 
+    @MirrorChatLogger.catch()
     def showInfo(self, content, title:str, duration:int = 3000, type:str = "info"):
         """显示侧边消息"""
         takes = {
@@ -117,6 +94,7 @@ class MainChatFrame(QFrame):
             parent = self
         )
 
+    @MirrorChatLogger.catch()
     def initToolButton(self):
         """初始化工具栏按钮"""
 
@@ -130,6 +108,7 @@ class MainChatFrame(QFrame):
         fileAction.triggered.connect(createTriggedSlot("send_file",args={"is_silence":False}))
         self.functionMenu.addAction(fileAction)
 
+    @MirrorChatLogger.catch()
     def initChatList(self, keywords:list = ["wxid", "@chatroom"]):
         """
         初始化聊天ID列表
@@ -140,6 +119,9 @@ class MainChatFrame(QFrame):
 
         # 因为要重置，所以要先清空
         self.chatObjectlist.clear()
+
+        def create_click_handler(idx):
+            return lambda: self.setCurrentChat(idx)
 
         for contact in self.contacts:
             # 排除特殊内容
@@ -153,7 +135,7 @@ class MainChatFrame(QFrame):
                         text = contact["name"],
                         tooltip = contact["name"],
                         position = NavigationItemPosition.SCROLL,
-                        onClick = lambda: self.setCurrentChat(self.chatObjectlist.index(contact))
+                        onClick = create_click_handler(self.chatObjectlist.index(contact))
                     )
 
     def filterContacts(self):
@@ -162,12 +144,15 @@ class MainChatFrame(QFrame):
 
         if not search_text:
             self.initChatList()
+        else:
+            # 清空聊天对象列表
+            self.chatObjectlist.clear()
         
         for contact in self.contacts:
+            # 清除导航栏中的联系人
             self.navigationInterface.removeWidget(contact["wxid"])
         
         # 重新添加过滤后的联系人
-        index = 0
         for contact in self.contacts:
             # 如果搜索内容为空或匹配联系人名称
             if not search_text or search_text in contact["name"].lower():
@@ -185,20 +170,22 @@ class MainChatFrame(QFrame):
                 if not ok:
                     continue
 
-        
+                # 添加到聊天对象列表
+                self.chatObjectlist.append(contact)
+
                 # 使用闭包为每个导航项创建独立的点击事件处理函数
                 def create_click_handler(idx):
                     return lambda: self.setCurrentChat(idx)
         
+                # 添加导航项        
                 self.navigationInterface.addItem(
                     icon = icon,
                     routeKey = contact["wxid"],
                     text = contact["name"],
                     tooltip = contact["name"],
                     position = NavigationItemPosition.SCROLL,
-                    onClick = create_click_handler(index)
+                    onClick = create_click_handler(self.chatObjectlist.index(contact))
                 )
-                index += 1
 
     def initNavigation(self):
         """初始化导航栏"""
@@ -212,8 +199,6 @@ class MainChatFrame(QFrame):
             position=NavigationItemPosition.TOP,
             onClick=self.toggleSearchBox
         )
-        
-        self.initChatList()
 
     def toggleSearchBox(self):
         """切换搜索框的显示状态"""
@@ -222,9 +207,12 @@ class MainChatFrame(QFrame):
         else:
             self.searchEdit.show()
             self.searchEdit.setFocus()
-            
+    
+    @MirrorChatLogger.catch()
     def setCurrentChat(self, index):
         # 设置当前聊天对象
+
+        MirrorChatLogger.debug(f"Set current chat to {self.chatObjectlist[index]}")
         self.currentChat = self.chatObjectlist[index]
         
         # 隐藏搜索框
@@ -245,10 +233,12 @@ class MainChatFrame(QFrame):
         self.chatLayout.addWidget(self.leftSpacer)  # 添加占位控件
         self.chatLayout.addSpacerItem(self.spacer)  # 添加占位控件
         
+    @MirrorChatLogger.catch()
     def emitSignalMsg(self, message:WxMsg):
         self.singals.singal_progess_message.emit(message)
 
     @pyqtSlot()
+    @MirrorChatLogger.catch()
     def sendMessage(self):
         if self.currentChat is None:
             self.showInfo(
@@ -269,22 +259,17 @@ class MainChatFrame(QFrame):
             self.inputEdit.clear()
 
             # 发送消息到微信
-            # sendMsg(message, self.currentChat["wxid"])
+            sendMsg(message, self.currentChat["wxid"])
             
             # 确保滚动条完全滚动到底部
             QTimer.singleShot(10, self.scrollToBottom)
 
     @pyqtSlot(WxMsg)
+    @MirrorChatLogger.catch()
     def receiveMessage(self, message:WxMsg):
 
         # 原有文本消息处理代码
-        print(message)
-
-        # 如果是文件消息
-        if message.type == 1090519089:
-            self.handleFileMessage(message)
-            return
-
+        MirrorChatLogger.debug(f"Received message: {message.content}")
 
         # 如果不是当前聊天对象的消息，则不处理
         if self.currentChat:
@@ -306,26 +291,37 @@ class MainChatFrame(QFrame):
         # 确保滚动条完全滚动到底部
         QTimer.singleShot(10, self.scrollToBottom)
 
-    def handleFileMessage(self, message: WxMsg, is_me):
+    def handleFileMessage(self, message: WxMsg = None, args: dict = {}):
         """处理文件消息"""
-        if self.currentChat:
+        if self.currentChat and message:
             return
-
-        # 获取文件名和路径（需要根据实际消息结构调整）
-        file_name = message.content
         
-        # 判断是否是自己发送的消息
-        # is_me = False
+        MirrorChatLogger.debug(f"Handling file message: {args if not message else message}")
+        
+        if message:
+            # 获取文件名和路径（需要根据实际消息结构调整）
+            file_path = message.content
+
+            file_name = os.path.basename(file_path)
+            
+            # 判断是否是自己发送的消息
+            is_me = message.sender == self.getwcf().get_self_wxid()
+        else:
+            file_path = args.get("file_path", "None")
+            # 从参数中获取文件名和路径
+            file_name = os.path.basename(file_path)
+            # 获取是否是自己发送的消息，默认为 True
+            is_me = args.get("is_me", True)
         
         timestamp = QDateTime.currentDateTime().toString("hh:mm:ss")
         
         # 创建文件消息控件
         file_widget = FileMessageWidget(
+            parent=self.chatContent,
             file_name=file_name,
-            file_path=file_name,
-            is_me=is_me,
+            file_path=file_path,
             timestamp=timestamp,
-            parent=self.chatContent
+            is_me=is_me
         )
         
         # 添加到聊天界面
@@ -339,6 +335,7 @@ class MainChatFrame(QFrame):
         # 滚动到底部
         QTimer.singleShot(10, self.scrollToBottom)
 
+    @MirrorChatLogger.catch()
     def scrollToBottom(self):
         """滚动到最底部"""
         # 确保滚动条完全滚动到底部
@@ -347,6 +344,7 @@ class MainChatFrame(QFrame):
         QApplication.processEvents()
         scroll_bar.setValue(scroll_bar.maximum())
 
+    @MirrorChatLogger.catch()
     def closeMsgListener(self):
         """关闭消息监听"""
         # 关闭消息监听线程

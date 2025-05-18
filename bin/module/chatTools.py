@@ -1,6 +1,8 @@
 from imports.MCmain import *
+from module.logRecoder import MirrorChatLogger
 from module.moduleLoader import load_module
 from pathlib import Path
+from wcferry import Wcf
 
 def get_directory_info(path):
     """获取目录内容并区分文件和文件夹"""
@@ -59,6 +61,10 @@ class ChatTools:
     def send_file(self, args:dict):
         """发送文件"""
 
+        def check_file_type(file_path):
+            """检查文件类型"""
+            return file_path.split(".")[-1]
+
         if not args["is_silence"]:
             # 使用QFileDialog选择文件
             file_path, _ = QFileDialog.getOpenFileName(
@@ -71,11 +77,29 @@ class ChatTools:
         # 如果用户选择了文件
         if file_path:
             # 获取 wcferry 对象
-            wcf = self.chat_frame.getwcf()
+            wcf:Wcf = self.chat_frame.getwcf()
 
             if self.chat_frame.currentChat:
                 # 如果当前有聊天对象，发送文件
-                wcf.send_file(file_path, self.chat_frame.currentChat["wxid"])
+                file_type = check_file_type(file_path)
+
+                MirrorChatLogger.debug(f"发送文件: {file_path}, 类型: {file_type}")
+                
+                if file_type in ["png", "jpg", "jpeg", "gif", "bmp"]:
+                    # 如果是图片文件，发送图片消息
+                    wcf.send_image(file_path, self.chat_frame.currentChat["wxid"])
+                elif file_type in ["mp4", "avi", "mov", "wmv", "flv"]:
+                    # 如果是视频文件，发送视频消息
+                    wcf.send_image(file_path, self.chat_frame.currentChat["wxid"])
+                else:
+                    # 其他文件，发送文件消息
+                    wcf.send_file(file_path, self.chat_frame.currentChat["wxid"])
+
+                self.chat_frame.handleFileMessage(args = {
+                    "file_path": file_path,
+                    "is_me": True
+                })
+
                 self.chat_frame.showInfo(
                     title = "发送",
                     content = f"{file_path} 发送成功",
