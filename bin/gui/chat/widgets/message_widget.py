@@ -1,10 +1,12 @@
-from imports.MCmain import *
+from bin.imports.MCmain import *
+from bin.module.wechatWapper import WxMsg
 
 class MessageWidget(QWidget):
-    def __init__(self, message, is_me=False, timestamp=None, parent=None):
+    def __init__(self, message:WxMsg | str, is_me=False, timestamp=None, parent=None):
         super().__init__(parent)
         self.is_me = is_me
         self.message = message
+        self.wparent = parent
         
         # 设置透明背景
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
@@ -23,12 +25,9 @@ class MessageWidget(QWidget):
         self.message_label.setStyleSheet("""
             font-size: 15px;
             color: black;
-            padding: 0px 0px 0px 23px;
-            margin: 0;
             text-align: left;
         """)
         
-        # 修改主布局的边距
         self.message_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)  # 设置对齐方式
         self.message_label.setAttribute(Qt.WidgetAttribute.WA_Hover, True) 
         self.message_label.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
@@ -40,8 +39,11 @@ class MessageWidget(QWidget):
         # 自动调整大小
         self.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
         self.adjustWidth()
-        self.setContentsMargins(10, 10, 20, 10)
+        self.setContentsMargins(10, 10, 10, 10)
         self.setAlignment(is_me)
+
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.contextEvent)
 
     def setAlignment(self, is_me):
         # 根据消息来源设置对齐方式
@@ -61,7 +63,6 @@ class MessageWidget(QWidget):
                     margin-right: 60px;
                 }
             """)
-
     
     def adjustWidth(self):
         # 根据文本内容计算最佳宽度
@@ -69,8 +70,8 @@ class MessageWidget(QWidget):
         text_width = font_metrics.horizontalAdvance(self.message_label.text())
         
         # 设置最小和最大宽度
-        min_width = 120  # 增加最小宽度
-        max_width = 400  # 增加最大宽度
+        min_width = 100    # 最小宽度
+        max_width = 400  # 最大宽度
         
         # 计算实际需要的宽度，考虑字符宽度和边距
         content_width = min(max(text_width, min_width), max_width)
@@ -102,3 +103,36 @@ class MessageWidget(QWidget):
         painter.drawPath(path)
         
         super().paintEvent(event)
+
+    def contextEvent(self, pos:QPoint):
+        """ 右键菜单事件 """
+        menu = RoundMenu(parent=self.parent())
+        copy_action = Action(FluentIcon.COPY, "复制")
+        copy_action.triggered.connect(self.copy_text)
+        show_full_action = Action(FluentIcon.VIEW, "查看")
+        show_full_action.triggered.connect(self.show_full_text)
+        menu.addAction(copy_action)
+
+        text:str = self.message.content if self.message is WxMsg else self.message
+        # 如果文本过长，添加查看完整内容选项
+        if len(text) > 100:  # 简单判断文本是否过长
+            menu.addAction(show_full_action)
+
+        menu.setMinimumWidth(300)
+        menu.setMaximumWidth(350)
+        menu.setFixedWidth(350)
+        menu.setDefaultAction(show_full_action)
+
+        pos.setX(pos.x() - 100)
+        menu.exec(self.mapToGlobal(pos))
+
+    def copy_text(self):
+        """ 复制文本到剪贴板 """
+        clipboard = QApplication.clipboard()
+        text:str = self.message.content if self.message is WxMsg else self.message
+        clipboard.setText(text)
+
+    def show_full_text(self):
+        """ 显示完整文本内容 """
+        text:str = self.message.content if self.message is WxMsg else self.message
+        self.wparent.showMessageBox(text[:15], text)

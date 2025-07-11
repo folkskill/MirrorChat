@@ -1,6 +1,6 @@
-from imports.MCmain import *
-from module.logRecoder import MirrorChatLogger
-from module.moduleLoader import load_module
+from bin.imports.MCmain import *
+from bin.module.logRecoder import MirrorChatLogger
+from bin.module.moduleLoader import load_module
 from pathlib import Path
 from wcferry import Wcf
 
@@ -35,11 +35,11 @@ class ChatTools:
         addon_name:str = None
         try:
             # 遍历插件目录
-            for addon in get_directory_info("bin\\addon"):
+            for addon in get_directory_info("bin//addon"):
                 if addon["is_dir"]:
                     # 加载插件
                     addon_name = addon["name"]
-                    load_module(self, path = f"bin\\addon\\{addon['name']}\\tools\\tool.mirc")
+                    load_module(self, path = f"bin//addon//{addon['name']}//tools//tool.mirc")
 
                     self.chat_frame.showInfo(
                         title = "插件",

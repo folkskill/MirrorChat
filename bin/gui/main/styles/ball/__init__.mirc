@@ -1,0 +1,46 @@
+from bin.imports.MCmain import *
+from bin.imports.OpenGL import *
+
+Qobject: object
+
+def generate_sphere(radius=1.0, sectors=500, stacks=500):
+    import numpy as np
+    vertices = []
+    indices = []
+
+    sector_step = 2 * np.pi / sectors
+    stack_step = np.pi / stacks
+
+    for i in range(stacks + 1):
+        stack_angle = np.pi / 2 - i * stack_step
+        xy = radius * np.cos(stack_angle)
+        z = radius * np.sin(stack_angle)
+
+        for j in range(sectors + 1):
+            sector_angle = j * sector_step
+            x = xy * np.cos(sector_angle)
+            y = xy * np.sin(sector_angle)
+            vertices.extend([x, y, z])
+
+    for i in range(stacks):
+        k1 = i * (sectors + 1)
+        k2 = k1 + sectors + 1
+
+        for j in range(sectors):
+            if i != 0:
+                indices.extend([k1, k2, k1 + 1])
+            if i != (stacks - 1):
+                indices.extend([k1 + 1, k2, k2 + 1])
+
+            k1 += 1
+            k2 += 1
+
+    return np.array(vertices, dtype=np.float32), np.array(indices, dtype=np.uint32)
+
+# 球体顶点数据（位置+颜色）
+Qobject.vertices, Qobject.indices = generate_sphere()
+
+# 添加定时器
+Qobject.timer = QTimer(Qobject)
+Qobject.timer.timeout.connect(Qobject.updateRotation)
+Qobject.timer.start(16)  # 约60 FPS

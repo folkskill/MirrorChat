@@ -1,0 +1,30 @@
+from bin.imports.MCmain import *
+from bin.imports.OpenGL import *
+
+Qobject: object
+
+glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+glClearColor(0.2, 0.2, 0.2, 1.0)
+
+Qobject.shader_program.bind()
+
+# 设置模型矩阵
+model = QMatrix4x4()
+model.rotate(Qobject.rotation_x, 1, 0, 0)
+model.rotate(Qobject.rotation_y, 0, 1, 0)
+Qobject.shader_program.setUniformValue("model", model)
+
+# 设置视图矩阵
+view = QMatrix4x4()
+view.translate(0, 0, -3)
+Qobject.shader_program.setUniformValue("view", view)
+
+# 设置投影矩阵
+projection = QMatrix4x4()
+projection.perspective(45, Qobject.width() / Qobject.height(), 0.1, 100.0)
+Qobject.shader_program.setUniformValue("projection", projection)
+
+Qobject.vao.bind()
+glDrawElements(GL_TRIANGLES, len(Qobject.indices), GL_UNSIGNED_INT, None)
+Qobject.vao.release()
+Qobject.shader_program.release()

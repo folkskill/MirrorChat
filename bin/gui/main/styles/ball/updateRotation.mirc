@@ -1,0 +1,7 @@
+Qobject: object
+
+# 每帧更新旋转角度
+Qobject.rotation_x += 0.5
+Qobject.rotation_y += 0.5
+
+Qobject.update()

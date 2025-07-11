@@ -14,6 +14,5 @@ def processStop(type = MirrorChatLogger.info):
     """
     处理程序停止时的操作，如关闭日志文件等。
     """
-    type("The program is stopping, closing the log file...")
     MirrorChatLogger.remove()
-    MirrorChatLogger.success("The log file has been closed.")
+    MirrorChatLogger.success("The log system has been closed.")

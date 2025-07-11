@@ -1,6 +1,5 @@
-from module.logRecoder import MirrorChatLogger
-from module.moduleLoader import load_module
-from imports.MCmain import *
+from bin.module.moduleLoader import load_module
+from bin.imports.MCmain import *
 from pathlib import Path
 import json
 
@@ -44,33 +43,42 @@ class PluginsFrame(QFrame):
         """添加插件卡片"""
         card = QFrame(self.scrollWidget)
         card.setObjectName("PluginCard")
-        card.setFixedHeight(100)
+        card.setFixedHeight(110)
         card.setCursor(Qt.CursorShape.PointingHandCursor)
         card.setProperty("enabled", True)  # 添加启用状态属性
 
         layout = QHBoxLayout(card)
-        # 减小整体内边距，这里把左边距调小
-        layout.setContentsMargins(0, 5, 5, 5)  
-        
+        # 统一设置内边距，让卡片内容居中
+        layout.setContentsMargins(0, 0, 0, 0)  
+        layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)  # 确保整个水平布局垂直
+
         # 插件图标容器
         iconContainer = QFrame(card)
         iconContainer.setObjectName("IconContainer")
-        iconContainer.setFixedSize(50, 50)
+        iconContainer.setFixedSize(80, 80)
         iconLayout = QVBoxLayout(iconContainer)
         iconLayout.setContentsMargins(0, 0, 0, 0)
-        
+        iconLayout.setAlignment(Qt.AlignmentFlag.AlignCenter)  # 设置图标在容器内居中
+
         # 插件图标
-        icon = FluentIcon.APPLICATION
+        addon_dir = Path("bin/addon") / addon_name
+        icon_path = addon_dir / "icon.png"
+        if icon_path.exists():
+            # 加载插件目录下的图标
+            icon = QIcon(str(icon_path))
+        else:
+            # 使用默认图标
+            icon = FluentIcon.APPLICATION.icon()
+
         iconLabel = QLabel(iconContainer)
-        iconLabel.setPixmap(icon.icon().pixmap(32, 32))
+        iconLabel.setPixmap(icon.pixmap(64, 64))
         iconLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         iconLayout.addWidget(iconLabel)
-        
-        # 减小图标与左边的间距
-        layout.addSpacing(2)  
-        layout.addWidget(iconContainer, alignment=Qt.AlignmentFlag.AlignLeft)
+
+        # 添加图标容器到水平布局，并确保垂直居中
+        layout.addWidget(iconContainer, alignment=Qt.AlignmentFlag.AlignVCenter)
         # 可根据需要调整图标与文字之间的距离
-        layout.addSpacing(4)  
+        layout.addSpacing(10)
 
         # 插件信息
         infoLayout = QVBoxLayout()
@@ -95,8 +103,8 @@ class PluginsFrame(QFrame):
         container = QFrame(self.scrollWidget)
         container.setObjectName("PluginContainer")
         containerLayout = QHBoxLayout(container)
-        containerLayout.setContentsMargins(10, 0, 10, 0)  # 上下边距从5px改为2px
-        containerLayout.setSpacing(15)
+        containerLayout.setContentsMargins(10, 0, 10, 0)
+        containerLayout.setSpacing(10)
 
         # 添加卡片到容器
         containerLayout.addWidget(card, stretch=1)  # 让卡片占据大部分空间
@@ -105,7 +113,7 @@ class PluginsFrame(QFrame):
         toggleButton = ToolButton(container)
         toggleButton.setObjectName(f"ToggleButton_{addon_name}")
         # 调整按钮高度适配卡片
-        button_height = card.height() - 10  # 预留 10px 边距
+        button_height = card.height() - 5  # 预留 5px 边距
         toggleButton.setFixedSize(int(button_height * 0.5), button_height)
         toggleButton.setCursor(Qt.CursorShape.PointingHandCursor)  # 鼠标悬停显示手型
         # 设置图标
@@ -138,7 +146,7 @@ class PluginsFrame(QFrame):
         bg_color = '#2E2E2E' if isDark else '#F5F5F5'
         hover_color = '#3A3A3A' if isDark else '#E0E0E0'
         border_color = '#444444' if isDark else '#DDDDDD'
-        disabled_color = 'rgba(255, 100, 100, 0.5)'  # 透明红色
+        disabled_color = 'rgba(255, 100, 100, 0.8)'  # 透明红色
         active_color = '#4CAF50' if isDark else '#66BB6A'  # 绿色
         inactive_color = '#f44336' if isDark else '#ef5350'  # 红色
         pressed_color = '#388E3C' if isDark else '#4CAF50'  # 按下时的绿色

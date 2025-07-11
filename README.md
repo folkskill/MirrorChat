@@ -30,14 +30,14 @@
 
 1. PyQt-Fluent-Widgets
 2. wcferry
-3. colorama
+3. loguru
 
 shell 使用 pip 下载示例：
 
 ```shell
-pip install "PyQt-Fluent-Widgets[full]" -i https://pypi.org/simple/
+pip install "PyQt6-Fluent-Widgets[full]" -i https://pypi.org/simple/
 pip install wcferry
-pip install colorama
+pip install loguru
 ```
 
 在 GitHub 中点击下载 ZIP。
@@ -78,15 +78,34 @@ python MirrorChatMain.py
 
 # 版本更新 🎉️
 
+## V0.4.0.20250708_release 🚀
+
+### 新增 🆕
+- 对插件中心实现了进一步的优化（添加图标，默认使用同插件目录下的 icon.png）
+- 添加了一个没什么用的插件：speaker，它可以朗读你的输入框信息。
+- 进一步更新 encoder 插件，实现更多有趣的功能：
+  · 根据用户的输入中文实现谐音的改造。
+  · 把用户的消息数据直接的转化为十六进制。
+- 实现了聊天背景对于 OpenGL 的支持。使得用户或开发者可以自己设计制作 OpenGL 渲染的聊天背景。并提供三个预设背景：
+  · 彩色遮罩正方体
+  · 彩色遮罩球体
+  · 海洋与漂浮的立方体。(完全由 [sheepsoup](https://space.bilibili.com/2144563839?spm_id_from=333.337.0.0) 独立制作并实现)
+- 为项目注册了一个 MySQL 数据库，以更好地访问云端项目信息，目前已经实现了版本检测功能。
+
+### 修复 ✅
+- 修复了插件中心的一些问题，比如显示比例不协调等等。
+- 修复 encoder 插件发送加密图片时，图片显示为文件形式，而不是图片形式的问题。
+
+<details><summary>点击查看更多历史版本 👇</summary>
+
 ## V0.3.1.20250518_release 🚀
 
 ### 新增 🆕
 - 实现发送文件的时候的发送文件消息气泡。
-- 完全实现了对于 encoder 插件的支持。
+- 完全实现了对于 encoder 插件的支持 (核心内容由 [sheepsoup](https://space.bilibili.com/2144563839?spm_id_from=333.337.0.0) 制作)。
 - 实现了对于消息的加密和解密。
 - 添加了插件界面，实现对插件的禁用和启用。
 
-<details><summary>点击查看更多历史版本 👇</summary>
 
 ## V0.3.0.20250501_beta 🔨
 

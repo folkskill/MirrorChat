@@ -1,0 +1,17 @@
+from bin.imports.MCmain import *
+from bin.imports.OpenGL import *
+
+Qobject: object
+
+glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+glClearColor(0.2, 0.2, 0.2, 1.0)  # 深灰色背景
+Qobject.shader_program.bind()
+
+Qobject.shader_program.setUniformValue("iTime", 20 * Qobject.times)
+
+Qobject.vao.bind()
+glDrawElements(GL_TRIANGLES, len(Qobject.indices), GL_UNSIGNED_INT, None)
+Qobject.vao.release()
+Qobject.shader_program.release()
+
+Qobject.update()

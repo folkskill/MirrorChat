@@ -1,0 +1,51 @@
+from bin.imports.MCmain import *
+from bin.imports.OpenGL import *
+
+Qobject: object
+
+Qobject.shader_program = QOpenGLShaderProgram(Qobject)
+Qobject.shader_program.addShaderFromSourceCode(QOpenGLShader.ShaderTypeBit.Vertex, """
+    #version 330 core
+    in vec3 aPos;
+    in vec3 aColor;
+    out vec3 ourColor;
+    uniform mat4 model;
+    uniform mat4 view;
+    uniform mat4 projection;
+    void main() {
+        gl_Position = projection * view * model * vec4(aPos, 1.0);
+        ourColor = aColor;
+    }
+""")
+Qobject.shader_program.addShaderFromSourceCode(QOpenGLShader.ShaderTypeBit.Fragment, """
+    #version 330 core
+    in vec3 ourColor;
+    out vec4 FragColor;
+    void main() {
+        FragColor = vec4(ourColor, 1.0);
+    }
+""")
+Qobject.shader_program.link()
+
+# 设置VAO, VBO, EBO
+Qobject.vao = QOpenGLVertexArrayObject()
+Qobject.vao.create()
+Qobject.vao.bind()
+
+Qobject.vbo = QOpenGLBuffer(QOpenGLBuffer.Type.VertexBuffer)
+Qobject.vbo.create()
+Qobject.vbo.bind()
+Qobject.vbo.allocate(Qobject.vertices.tobytes(), Qobject.vertices.nbytes)
+
+Qobject.ebo = QOpenGLBuffer(QOpenGLBuffer.Type.IndexBuffer)
+Qobject.ebo.create()
+Qobject.ebo.bind()
+Qobject.ebo.allocate(Qobject.indices.tobytes(), Qobject.indices.nbytes)
+
+# 设置顶点属性指针
+glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), None)
+glEnableVertexAttribArray(0)
+glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), ctypes.c_void_p(3 * sizeof(GLfloat)))
+glEnableVertexAttribArray(1)
+
+glEnable(GL_DEPTH_TEST)

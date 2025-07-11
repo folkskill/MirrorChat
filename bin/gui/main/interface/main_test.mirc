@@ -3,7 +3,7 @@
 # 适用对象：
 #     标准子界面。(QFrame)
 
-from imports.MCmain import *
+from bin.imports.MCmain import *
 
 args:tuple
 Qobject: QFrame

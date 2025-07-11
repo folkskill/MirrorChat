@@ -1,3 +1,1 @@
-from loguru import logger
-
-logger.info("Hello, World!")
+print(b'\xce\xde\xd0\xa7\xb2\xd9\xd7\xf7'.decode('gbk'))

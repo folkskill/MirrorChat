@@ -1,0 +1,32 @@
+from bin.imports.MCmain import *
+from bin.imports.OpenGL import *
+import numpy as np
+
+Qobject: object
+
+# 立方体顶点数据（位置+颜色）
+Qobject.vertices = np.array([
+    # 前面
+    -0.5,-0.5, 0.5, 1.0, 0.0, 0.0,
+    0.5, -0.5, 0.5, 0.0, 1.0, 0.0,
+    0.5,  0.5, 0.5, 0.0, 0.0, 1.0,
+    -0.5, 0.5, 0.5, 1.0, 1.0, 0.0,
+    # 后面
+    -0.5,-0.5, -0.5, 1.0, 0.0, 1.0,
+    0.5, -0.5, -0.5, 0.0, 1.0, 1.0,
+    0.5,  0.5, -0.5, 1.0, 1.0, 1.0,
+    -0.5, 0.5, -0.5, 0.5, 0.5, 0.5
+], dtype=np.float32)
+Qobject.indices = np.array([
+    0, 1, 2, 2, 3, 0,  # 前面
+    1, 5, 6, 6, 2, 1,  # 右面
+    7, 6, 5, 5, 4, 7,  # 后面
+    4, 0, 3, 3, 7, 4,  # 左面
+    4, 5, 1, 1, 0, 4,  # 底面
+    3, 2, 6, 6, 7, 3   # 顶面
+], dtype=np.uint32)
+
+    # 添加定时器
+Qobject.timer = QTimer(Qobject)
+Qobject.timer.timeout.connect(Qobject.updateRotation)
+Qobject.timer.start(16)  # 约60 FPS

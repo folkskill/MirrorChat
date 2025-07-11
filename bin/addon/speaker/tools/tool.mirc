@@ -1,0 +1,21 @@
+from bin.imports.MCmain import *
+
+Qobject: object
+
+ADDON_NAME = "speaker"
+
+def createTriggedSlot(key_name: str, args: dict = {}):
+    return lambda: args["self"].functions[key_name](args)
+
+def speak(args:dict):
+    from os import getcwd
+    from subprocess import Popen
+    msg:str = args["self"].chat_frame.inputEdit.text()
+    cwd = getcwd()
+    Popen([cwd + f"\\bin\\addon\\{args["addon_name"]}\\speak.vbs", msg], shell=True)
+
+fileAction = Action(FluentIcon.SPEAKERS, "朗读", Qobject.chat_frame)
+fileAction.triggered.connect(createTriggedSlot(ADDON_NAME, args={"chat_frame": Qobject.chat_frame, "self": Qobject, "addon_name": ADDON_NAME}))
+Qobject.chat_frame.functionMenu.addAction(fileAction)
+
+Qobject.functions[ADDON_NAME] = speak

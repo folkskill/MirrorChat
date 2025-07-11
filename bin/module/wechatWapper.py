@@ -1,4 +1,4 @@
-from module.logRecoder import MirrorChatLogger
+from bin.module.logRecoder import MirrorChatLogger
 from queue import Empty
 from wcferry import *
 import threading

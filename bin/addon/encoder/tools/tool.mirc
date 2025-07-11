@@ -1,12 +1,23 @@
-from imports.MCmain import *
+from bin.imports.MCmain import *
+from Pinyin2Hanzi import DefaultDagParams
+
+# 缓存 DefaultDagParams 对象
+dag_params = DefaultDagParams()
 
 Qobject: object
 
 ADDON_NAME = "encoder"
 
+# 加密类型:
+BY_SOUND = 0
+TO_16CODE = 1
+
 def createTriggedSlot(key_name: str, args: dict = {}):
     """构建槽函数。"""
     return lambda: args["self"].functions[key_name](args)
+def createFuncName(func):
+    global ADDON_NAME
+    return f"{ADDON_NAME}.{func}"
 
 def encode_message_to_image(args:dict) -> str:
     """将消息加密并发送。"""
@@ -40,7 +51,7 @@ def encode_message_to_image(args:dict) -> str:
     while not os.path.exists(run_args["file_path"]):
         sleep(0.01)
     new_time = time()
-    used_time = new_time - old_time
+    used_time = round(new_time - old_time, 2)
     chat_frame.showInfo(title = args["addon_name"], content = f"用时{used_time}秒。", type = "success")
 
     # 发送文件。
@@ -48,8 +59,90 @@ def encode_message_to_image(args:dict) -> str:
     # 清空输入框。
     chat_frame.inputEdit.clear()
 
-fileAction = Action(FluentIcon.SHARE, "加密并发送", Qobject.chat_frame)
-fileAction.triggered.connect(createTriggedSlot("encoder", args={"chat_frame": Qobject.chat_frame, "self": Qobject, "addon_name": ADDON_NAME}))
-Qobject.chat_frame.functionMenu.addAction(fileAction)
+def encode_message_to_message(args:dict) -> str:
+    """将消息加密并覆盖聊天框内容"""
+    global BY_SOUND, TO_16CODE
+    def generate_new_sentence(input_str):
+        from pypinyin import lazy_pinyin
+        from Pinyin2Hanzi import dag
+        import random
+        import re
+        def pinyin_to_hanzi(pinyin):
+            global dag_params
+            # 为单个拼音获取候选汉字，设置候选值为 10
+            result = dag(dag_params, [pinyin], path_num=10, log=False)
+            if result:
+                # 按得分从高到低排序
+                result.sort(key=lambda x: x.score, reverse=True)
+                # 优先从得分高的前几个结果中选择
+                top_results = result[:3]  # 取前 3 个得分高的结果
+                random_result = random.choice(top_results)
+                return ''.join(random_result.path)
+            return pinyin
+        
+        # 记录非法字符的位置和内容
+        non_chinese_chars = []
+        chinese_chars = ""
+        for i, char in enumerate(input_str):
+            if not re.match(r'[\u4e00-\u9fa5]', char):
+                non_chinese_chars.append((i, char))
+            else:
+                chinese_chars += char
+        
+        # 处理中文字符
+        encrypted_chinese = ""
+        for char in chinese_chars:
+            # 将单个字符转换为拼音，直接获取拼音
+            pinyin = lazy_pinyin(char, errors='ignore')[0] if lazy_pinyin(char, errors='ignore') else ""
+            # 调用函数将单个拼音转换为汉字
+            new_char = pinyin_to_hanzi(pinyin)
+            encrypted_chinese += new_char
+        
+        # 将加密后的中文字符和非法字符组合
+        result_list = list(encrypted_chinese)
+        for pos, char in reversed(non_chinese_chars):
+            result_list.insert(pos, char)
+        return ''.join(result_list)
+    
+    def ascii_to_hex_string(input_str):
+        ascii_list = [ord(char) for char in input_str]
+        hex_string = ' '.join(format(num, '02X') for num in ascii_list)
+        return hex_string
+    
+    EncodeType = args["encode_type"]
+    msg:str = args["self"].chat_frame.inputEdit.text()
+    encode_result = None
 
-Qobject.functions[ADDON_NAME] = encode_message_to_image
+    if EncodeType == BY_SOUND:
+        # 实现根据文字的拼音生成谐音消息。
+        encode_result = generate_new_sentence(msg)
+    elif EncodeType == TO_16CODE:
+        encode_result = ascii_to_hex_string(msg)
+    else:
+        args["self"].chat_frame.showInfo(title = args["addon_name"], content = "未知的加密类型。", type = "error")
+        return
+    
+    args["self"].chat_frame.inputEdit.clear()
+    args["self"].chat_frame.sendMessage(encode_result)
+
+# 函数注册
+Qobject.functions[createFuncName(encode_message_to_image)] = encode_message_to_image
+Qobject.functions[createFuncName(encode_message_to_message)] = encode_message_to_message
+
+# 子菜单
+EmsgToImgA = Action(FluentIcon.PHOTO, "加密为图片", Qobject.chat_frame)
+EmsgToImgA.triggered.connect(
+    createTriggedSlot(createFuncName(encode_message_to_image),
+        args={"chat_frame":Qobject.chat_frame, "self": Qobject, "addon_name": ADDON_NAME}))
+
+Emsg1A = Action(FluentIcon.LANGUAGE, "拼音模糊", Qobject.chat_frame)
+Emsg1A.triggered.connect(
+    createTriggedSlot(createFuncName(encode_message_to_message),
+        args={"chat_frame":Qobject.chat_frame, "self": Qobject, "addon_name": ADDON_NAME, "encode_type": BY_SOUND}))
+Emsg2A = Action(FluentIcon.CODE, "乱码转换", Qobject.chat_frame)
+Emsg2A.triggered.connect(
+    createTriggedSlot(createFuncName(encode_message_to_message),
+        args={"chat_frame":Qobject.chat_frame, "self": Qobject, "addon_name": ADDON_NAME, "encode_type": TO_16CODE}))
+
+# 添加 Action 到 主Menu 中
+Qobject.chat_frame.functionMenu.addActions([EmsgToImgA, Emsg1A, Emsg2A])

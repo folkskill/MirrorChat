@@ -1,9 +1,9 @@
 # coding:utf-8
 import os
-from imports.MCmain import *
+from bin.imports.MCmain import *
 from qfluentwidgets import isDarkTheme, FluentTranslator
 from qfluentwidgets import FluentIcon as FIF
-from module.moduleLoader import load_module
+from bin.module.moduleLoader import load_module
 from qfluentwidgets import __version__
 from enum import Enum
 
@@ -305,7 +305,7 @@ class SettingInterface(ScrollArea):
         self.__setQss()
 
         # initialize layout
-        load_module(self, [], "bin\gui\settings\interface\settings.mirc")
+        load_module(self, [], "bin/gui/settings/interface/settings.mirc")
         self.__connectSignalToSlot()
 
     def __setQss(self):

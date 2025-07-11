@@ -1,6 +1,13 @@
-from imports.MCmain import *
+from bin.gui.main.widgets.chat_content import ChatContent
+from bin.imports.MCmain import *
 
 Qobject:QFrame
+
+
+# 聊天窗口区域
+Qobject.chatWindow = SmoothScrollArea(Qobject)
+Qobject.chatWindow.setWidgetResizable(True)
+Qobject.chatWindow.setObjectName("chatWindow")
 
 # 主布局
 Qobject.hBoxLayout = QHBoxLayout(Qobject)
@@ -10,7 +17,8 @@ Qobject.navigationInterface = NavigationInterface(Qobject, showReturnButton=Fals
 
 # 工具按钮
 Qobject.functionButton = DropDownToolButton(parent = Qobject)
-Qobject.functionButton.setIcon(FluentIcon.MORE)
+Qobject.functionButton.setArrowType(Qt.ArrowType.NoArrow)
+Qobject.functionButton.setIcon(FluentIcon.CLIPPING_TOOL)
 
 # 右侧主内容区域
 Qobject.rightWidget = QWidget(Qobject)
@@ -18,13 +26,8 @@ Qobject.rightLayout = QVBoxLayout(Qobject.rightWidget)
 Qobject.rightLayout.setSpacing(0)
 Qobject.rightLayout.setContentsMargins(0, 0, 0, 0)
 
-# 聊天窗口区域
-Qobject.chatWindow = SmoothScrollArea(Qobject)
-Qobject.chatWindow.setWidgetResizable(True)
-Qobject.chatWindow.setObjectName("chatWindow")
-
 # 聊天内容区域
-Qobject.chatContent = QWidget(Qobject)
+Qobject.chatContent = ChatContent(Qobject)
 Qobject.chatContent.setObjectName("chatContent")
 
 # 聊天内容布局

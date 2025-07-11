@@ -4,7 +4,7 @@
     },
     "DesktopLyric": {
         "Alignment": "Center",
-        "FontFamily": "黑体",
+        "FontFamily": "微软雅黑",
         "FontSize": 50,
         "HighlightColor": "#ff00fbff",
         "StrokeColor": "#ff9bf3ff",
@@ -18,7 +18,7 @@
         "DpiScale": "Auto",
         "EnableAcrylicBackground": false,
         "Language": "zh_CN",
-        "MinimizeToTray": false,
+        "MinimizeToTray": true,
         "PlayBarColor": "#ff225c7f",
         "RecentPlayNumbers": 300
     },

@@ -1,4 +1,4 @@
-from imports.MCmain import *
+from bin.imports.MCmain import *
 
 Qobject: QFrame
 
@@ -6,7 +6,9 @@ Qobject.setObjectName("PluginsFrame")
 
 # 创建主布局和滚动区域
 Qobject.vBoxLayout = QVBoxLayout(Qobject)
-Qobject.titleLabel = SubtitleLabel("插件中心")
+Qobject.titleLabel = SubtitleLabel("    插件中心",Qobject)
+Qobject.titleLabel.setBaseSize(200, 20)
+Qobject.vBoxLayout.addSpacing(5)
 Qobject.vBoxLayout.addWidget(Qobject.titleLabel)
 
 # 创建滚动区域
@@ -24,5 +26,5 @@ Qobject.vBoxLayout.addWidget(Qobject.scrollArea)
 Qobject.topSpacer = QSpacerItem(20, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 Qobject.scrollLayout.addItem(Qobject.topSpacer)
 
-# 减小滚动布局的间距
+# 滚动布局的间距
 Qobject.scrollLayout.setSpacing(2)  # 将间距设置为2px

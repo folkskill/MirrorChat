@@ -1,0 +1,19 @@
+from bin.imports.MCmain import *
+from bin.imports.OpenGL import *
+import numpy as np
+
+Qobject: object
+
+# 2D 平面的顶点数据
+Qobject.vertices = np.array([
+    -1.0, -1.0, 0.0,
+     1.0, -1.0, 0.0,
+     1.0,  1.0, 0.0,
+    -1.0,  1.0, 0.0
+], dtype=np.float32)
+
+# 索引数据
+Qobject.indices = np.array([
+    0, 1, 2,
+    2, 3, 0
+], dtype=np.uint32)
